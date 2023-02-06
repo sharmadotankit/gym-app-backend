@@ -18,7 +18,10 @@ const UserSchema = new Schema({
     date: {
         type: Date,
         default: Date.now
-    }
+    },
+    token: {
+        type: String,
+    },
 });
 
 const User = mongoose.model('user', UserSchema);
