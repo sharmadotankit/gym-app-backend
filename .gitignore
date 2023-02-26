@@ -7,4 +7,6 @@ node_modules/
 
 #Ignoring lock file
 *.lock
-*lock.json
+*lock.json*
+
+*.env*

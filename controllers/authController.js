@@ -72,11 +72,19 @@ const login = async(req,res)=>{
         }
         let user = await UserModel.findOne({email})
         if(!user){
-            res.status.send(501).error({error:"Not a valid user please login with correct credentials"})
+            return res.status(500).json({
+                status: false,
+                message: "Not a valid user please login with correct credentials",
+                data: null,
+            });
         }
         let passwordCompare = await bcrypt.compare(password,user.password)
         if(!passwordCompare){
-            res.status.send(501).error({error:"Unauthorized user please login with correct credentials"})
+            return res.status(500).json({
+                status: false,
+                message: "Unauthorized user please login with correct credentials",
+                data: "Not a valid user please login with correct credentials",
+            });
         }
         let data ={
             user:{
