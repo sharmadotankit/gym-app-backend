@@ -14,8 +14,5 @@ app.use(cors())
 app.use('/api/auth',require('./routes/auth'));
 
 
-
-
-
 app.listen(port, ()=>
  console.log(`Server listening at port ${port}`));

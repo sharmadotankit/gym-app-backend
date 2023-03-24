@@ -8,7 +8,6 @@ const JET = process.env.JWT_SECRET;
 
 const createUser = async(req,res)=>{
     try{
-        console.log("came here")
         const errors = validationResult(req);
         // console.log("Errors",errors)
         if (!errors.isEmpty()) {
