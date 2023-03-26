@@ -1,17 +1,25 @@
 const express = require('express');
 const cors =require('cors');
-
-
-require('dotenv').config();
-const connectToMongo = require("./db")
-connectToMongo();
-
-let port = process.env.PORT;
+require("dotenv").config();
 const app = express();
 app.use(express.json());
 app.use(cors())
 
-app.use('/api/auth',require('./routes/auth'));
+
+const connectToMongo = require("./db")
+connectToMongo();
+
+const commanRoute = require('./routes/commonRoute')
+const authRoute = require('./routes/auth')
+
+let port = process.env.PORT;
+
+
+
+
+app.use('/api/auth',authRoute);
+app.use('/comman', commanRoute);
+
 
 
 app.listen(port, ()=>

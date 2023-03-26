@@ -11,16 +11,17 @@ const createUser = async(req,res)=>{
         const errors = validationResult(req);
         // console.log("Errors",errors)
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            throw{
+                message:"Please enter valid data"
+            }
         }
+
         let user = await UserModel.findOne({email:req.body.email})
 
         if(user){
-            res.status(501).json({
-                status: false,
-                message: "User already exists",
-                data: null,
-            });
+            throw{
+                message:"User already exists"
+            }
         }
 
         let salt = await bcrypt.genSalt(10);
@@ -56,7 +57,6 @@ const createUser = async(req,res)=>{
             data: err,
         });
     }
-
 }
 
 const login = async(req,res)=>{
@@ -91,6 +91,7 @@ const login = async(req,res)=>{
                 email: user.email,
             }
         }
+
         let authToken = jwt.sign(data,JET);
         let jwtUserResponse = await UserModel.findOneAndUpdate({_id:user._id},{token:authToken},{new:true});
 
@@ -103,6 +104,7 @@ const login = async(req,res)=>{
             data:jwtUserResponse,
         })
     }catch(err){
+        console.log('error',err)
         res.status(400).json({
             status:false,
             statusCode:400,

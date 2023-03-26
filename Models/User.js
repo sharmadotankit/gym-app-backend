@@ -22,6 +22,12 @@ const UserSchema = new Schema({
     token: {
         type: String,
     },
+    height:{
+        type:Number
+    },
+    weight:{
+        type:Number
+    }
 });
 
 const User = mongoose.model('user', UserSchema);
