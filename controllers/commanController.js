@@ -1,5 +1,5 @@
 const getTokenData = require('../utils/helper').getTokenData;
-const SavedExerciseModel = require("../models/SavedExercise");
+const SavedExerciseModel = require("../Models/SavedExercise");
 const UserModel = require('../Models/User');
 
 const saveExerciseToProfile = async(req,res)=>{
