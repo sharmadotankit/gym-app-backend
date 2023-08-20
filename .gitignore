@@ -10,3 +10,5 @@ node_modules/
 *lock.json*
 
 *.env*
+# Local Netlify folder
+.netlify
