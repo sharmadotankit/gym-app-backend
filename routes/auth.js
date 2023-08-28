@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { body, validationResult } = require('express-validator');
-const User = require('../Models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { body } = require('express-validator');
 const fetchuser = require('../middleware/fetchuser');
-const JET = process.env.JWT_SECRET;
+
 const authController = require('../controllers/authController');
 
 
@@ -18,13 +15,11 @@ router.post('/create-user',[
 ],authController.createUser);
 
 //Endpoint to login a user /no login -required==============================================================
-router.post('/login',[
-    body('email','Email must be a valid email').isEmail(),
-    body('password','Password must be at least 5 characters').isLength({ min: 5 }),
-],authController.login)
+router.post('/login',authController.login)
 
 //Endpoint to get a user /login required========================================================================
-router.get('/getuser',fetchuser,authController.getUser)
+router.get('/getuser',fetchuser,authController.getUser);
+router.get('/forgot-password')
 
 
 module.exports = router;

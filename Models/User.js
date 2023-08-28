@@ -27,6 +27,10 @@ const UserSchema = new Schema({
     },
     weight:{
         type:Number
+    },
+    isPremium:{
+        type:Boolean,
+        default:false,
     }
 });
 

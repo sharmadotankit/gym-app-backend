@@ -37,7 +37,9 @@ const createUser = async(req,res)=>{
             email: user.email,
         };
 
-        let authToken = jwt.sign(data,JET);
+        jwtOptions = { expiresIn: '720h' }
+
+        let authToken = jwt.sign(data,JET,jwtOptions);
 
         let jwtUserResponse = await UserModel.findByIdAndUpdate(user._id,{token:authToken},{new:true});
 
@@ -45,7 +47,7 @@ const createUser = async(req,res)=>{
 
         res.status(200).json({
             status:true,
-            response:jwtUserResponse,
+            data:jwtUserResponse,
             message:"User created successfully"
         })
 
@@ -61,7 +63,8 @@ const createUser = async(req,res)=>{
 
 const login = async(req,res)=>{
     try{
-        let {email,password}=req.body
+        console.log('came here')
+        let {email,password}=req.body;
         if(!email || !password){
             res.status(401).json({
                 status:false,
@@ -69,21 +72,17 @@ const login = async(req,res)=>{
                 message:"Invalid email and password provided"
             })
         }
-        let user = await UserModel.findOne({email})
+        let user = await UserModel.findOne({email});
+
         if(!user){
-            return res.status(500).json({
-                status: false,
-                message: "Not a valid user please login with correct credentials",
-                data: null,
-            });
-        }
+            throw{
+                message:"Email is not registered."
+            }
+          }
+
         let passwordCompare = await bcrypt.compare(password,user.password)
         if(!passwordCompare){
-            return res.status(500).json({
-                status: false,
-                message: "Unauthorized user please login with correct credentials",
-                data: "Not a valid user please login with correct credentials",
-            });
+            throw { message: "Wrong Credentials" };
         }
         let data ={
             user:{
@@ -92,7 +91,9 @@ const login = async(req,res)=>{
             }
         }
 
-        let authToken = jwt.sign(data,JET);
+        jwtOptions = { expiresIn: '720h' }
+
+        let authToken = jwt.sign(data,JET,jwtOptions);
         let jwtUserResponse = await UserModel.findOneAndUpdate({_id:user._id},{token:authToken},{new:true});
 
         delete jwtUserResponse.token;
@@ -104,7 +105,6 @@ const login = async(req,res)=>{
             data:jwtUserResponse,
         })
     }catch(err){
-        console.log('error',err)
         res.status(400).json({
             status:false,
             statusCode:400,
