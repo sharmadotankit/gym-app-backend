@@ -4,7 +4,7 @@ const UserModel = require("../Models/User");
 const endpointSecret ="whsec_8707cfee38baec89038ac90b199c6a4e3e725a57e22abbe21a01bfd62b12e1ed"
 const handleSuccessPayment = async (req, res) => {
   try {
-    
+    console.log('cma here from webhook')
     const signature = req.headers["stripe-signature"];
     const rawBody = req.body.toString('utf8');
     let event;
@@ -12,7 +12,7 @@ const handleSuccessPayment = async (req, res) => {
       event = stripe.webhooks.constructEvent(
         rawBody,
         signature,
-        endpointSecret
+        process.env.STRIPE_PRIVATE_KEY
       );
     } catch (err) {
         console.log('err ror ',err)
@@ -20,7 +20,7 @@ const handleSuccessPayment = async (req, res) => {
       return;
     }
 
-    console.log("event.type",event.type)
+    console.log("event.type",event)
     switch (event.type) {
         case 'checkout.session.completed':
           const sessionData = event.data.object;
