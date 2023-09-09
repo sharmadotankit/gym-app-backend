@@ -17,9 +17,9 @@ router.post('/create-user',[
 //Endpoint to login a user /no login -required==============================================================
 router.post('/login',authController.login)
 
-//Endpoint to get a user /login required========================================================================
-router.get('/getuser',fetchuser,authController.getUser);
-router.get('/forgot-password')
+
+router.post('/forgot-password',authController.forgotPassWord);
+router.post('/reset-password',authController.resetPassword);
 
 
 module.exports = router;

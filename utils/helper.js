@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const OtpModel = require('../Models/Otp');
 
 let helper = {
     getTokenData: function(data){
@@ -23,6 +24,42 @@ let helper = {
         } catch (error) {
             console.log("error",error)
             return false;
+        }
+    },
+    generateOTP: async (userId) => {
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        await OtpModel.updateOne({ userId }, {
+            code: otp,
+            userId,
+            isDeleted: false
+         }, { upsert : true });
+         return otp
+    },
+    checkIfUser:function(req,res,next){
+        try {
+            let header = req.headers.authorization;
+            if(!header){
+                throw({
+                    message: "Authorization header is required"
+                })
+            }
+            else{
+                let splitTokn = header.split(' ');
+                let token = splitTokn[1];
+                if (!token) throw({
+                    message: "Authorization header is required"
+                })
+                let userData = jwt.verify(token, process.env.JWT_SECRET);
+                if(!userData){
+                    res.status(401);
+                    return res.send("Unauthorized user")
+                }      
+               next();
+            }
+        } catch (error) {
+            console.log("error",error)
+            res.status(401);
+            return res.send("Unauthorized user")
         }
     },
 }

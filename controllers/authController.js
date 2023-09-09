@@ -1,9 +1,18 @@
 const { body, validationResult } = require('express-validator');
 const UserModel = require('../Models/User');
+const OtpModel = require('../Models/Otp');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const fetchuser = require('../middleware/fetchuser');
 const JET = process.env.JWT_SECRET;
+const ElasticEmail = require('@elasticemail/elasticemail-client');
+const defaultClient = ElasticEmail.ApiClient.instance;
+let apikey = defaultClient.authentications['apikey'];
+apikey.apiKey = process.env.ELASTIC_EMAIL_API_KEY;
+const directories = `${process.cwd()}/templates/`;
+const ejs = require('ejs');
+const helper = require('../utils/helper'); 
+ 
+let api = new ElasticEmail.EmailsApi()
 
 
 const createUser = async(req,res)=>{
@@ -63,7 +72,6 @@ const createUser = async(req,res)=>{
 
 const login = async(req,res)=>{
     try{
-        console.log('came here')
         let {email,password}=req.body;
         if(!email || !password){
             res.status(401).json({
@@ -116,15 +124,115 @@ const login = async(req,res)=>{
 }
 
 
-const getUser = async(req,res)=>{
-    let userId = await req.user.id;
-    let user = await user.findById(userId).select("-password");
-    res.send({user})
+
+const forgotPassWord = async(req,res)=>{
+    try{
+        const data = req.body;
+
+        const userResponse  = await UserModel.findOne({email:data.email});
+
+        if(!userResponse){
+            throw{
+                message:"User with this email does not exist."
+            }
+        }
+
+        let otpValue = await helper.generateOTP(userResponse._id)
+
+        const sendemail = await ejs.renderFile(directories + "forgotPassword.ejs", { data: { userName: userResponse.name, otp:otpValue } });
+
+        let email = ElasticEmail.EmailMessageData.constructFromObject({
+            Recipients: [
+              new ElasticEmail.EmailRecipient(userResponse.email)
+            ],
+            Content: {
+              Body: [
+                ElasticEmail.BodyPart.constructFromObject({
+                  ContentType: "HTML",
+                  Content: sendemail
+                })
+              ],
+              Subject: "Reset password otp.",
+              From: process.env.SENDER_EMAIL,
+            }
+          });
+
+          const callback = function(error, data, response) {
+            if (error) {
+              console.error(error);
+            } else {
+              console.log('Email sent successfully.');
+            }
+          };
+          api.emailsPost(email, callback)
+
+  
+        res.status(200).json({
+            status:true,
+            statusCode:200,
+            message:"Otp is sent to your email",
+            data:null,
+        })
+    }catch(err){
+        res.status(400).json({
+            status:false,
+            statusCode:400,
+            message:err.message,
+            error:err,
+        })
+    }
+
+}
+
+const resetPassword = async(req,res)=>{
+    try{
+        const data = req.body;
+
+        const userResponse  = await UserModel.findOne({email:data.email});
+
+        if(!userResponse){
+            throw{
+                message:"User with this email does not exist."
+            }
+        }
+
+        console.log(data)
+        const salt = await bcrypt.genSalt(10);
+        data.newPassword = await bcrypt.hash(data.confirmPassword, salt);
+
+        const MS_PER_MINUTE = 60000;
+        const createdAt = new Date(new Date().getTime() - 15 * MS_PER_MINUTE);
+        let compareOtp = await OtpModel.findOne({ code: data.otp, userId: userResponse._id, isDeleted: false, updatedAt: { $gte: createdAt } })
+        
+        if (!compareOtp) {
+            throw { message: "Invalid otp. Please try again." };
+        }
+
+        await OtpModel.findOneAndUpdate({ userId: userResponse._id }, { isDeleted: true });
+        const updatedUser = await UserModel.findOneAndUpdate({email:data.email},{password:data.newPassword},{new:true});
+        
+        res.status(200).json({
+            status:true,
+            statusCode:200,
+            message:"Password reset successfully.",
+            data:null,
+        })
+    }catch(err){
+        console.log(err)
+        res.status(400).json({
+            status:false,
+            statusCode:400,
+            message:err.message,
+            error:err,
+        })
+    }
+
 }
 
 
 module.exports = {
     createUser,
     login,
-    getUser,
+    forgotPassWord,
+    resetPassword,
 }
