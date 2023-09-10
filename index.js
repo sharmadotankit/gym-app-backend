@@ -3,9 +3,12 @@ const bodyParser = require('body-parser');
 const cors =require('cors');
 require("dotenv").config();
 const app = express();
-app.use(express.json());
 app.use(cors())
-app.use(bodyParser.raw({ type: 'application/json' }));
+
+const stripeRoute =  require('./routes/stripeRoute');
+app.use('/stripe', stripeRoute);
+app.use(express.json());
+app.use(bodyParser.json())
 
 const connectToMongo = require("./db")
 connectToMongo();

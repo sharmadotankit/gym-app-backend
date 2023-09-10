@@ -1,42 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 const UserModel = require("../Models/User");
 
-const endpointSecret ="whsec_8707cfee38baec89038ac90b199c6a4e3e725a57e22abbe21a01bfd62b12e1ed"
-const handleSuccessPayment = async (req, res) => {
-  try {
-    console.log('cma here from webhook')
-    const signature = req.headers["stripe-signature"];
-    const rawBody = req.body.toString('utf8');
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(
-        rawBody,
-        signature,
-        process.env.STRIPE_PRIVATE_KEY
-      );
-    } catch (err) {
-        console.log('err ror ',err)
-      res.status(400).send(`Webhook Error: ${err.message}`);
-      return;
-    }
 
-    console.log("event.type",event)
-    switch (event.type) {
-        case 'checkout.session.completed':
-          const sessionData = event.data.object;
-          const userId = sessionData.metadata.userId;
-          console.log(`User ID: ${userId}`);
-          await UserModel.findByIdAndUpdate(userId, { $set: { isPremium: true } });
-          break;
-        default:
-          console.log(`Unhandled event type ${event.type}`);
-      }
-  } catch (error) {
-    console.error("Error handling webhook:", error);
-    return res.status(400).send("Webhook error");
-  }
-  res.json({ received: true });
-};
 
 const createCheckoutSession = async (req, res) => {
   try {
@@ -122,7 +87,6 @@ const getUserData = async (req, res) => {
   };
 
 module.exports = {
-  handleSuccessPayment,
   createCheckoutSession,
   getUserData,
 };
