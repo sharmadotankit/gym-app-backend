@@ -7,6 +7,7 @@ const handleSuccessPayment = async (req, res) => {
   try {
     const signature = req.headers["stripe-signature"];
     const rawBody = req.body.toString('utf8');
+    console.log("rawBody ",rawBody)
     let event;
     try {
       event = stripe.webhooks.constructEvent(
