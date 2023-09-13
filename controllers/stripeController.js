@@ -6,8 +6,6 @@ const endpointSecret =process.env.WEBHOOK_SECRET;
 const handleSuccessPayment = async (req, res) => {
   try {
     const signature = req.headers["stripe-signature"];
-    // const rawBody = req.body.toString('utf8');
-    // console.log("rawBody ",rawBody)
     let event;
     try {
       event = stripe.webhooks.constructEvent(
@@ -21,7 +19,7 @@ const handleSuccessPayment = async (req, res) => {
       return;
     }
 
-    console.log('event.type',event.type)
+    console.log('event.data.object',event.data.object)
     switch (event.type) {
         case 'checkout.session.completed':
           const sessionData = event.data.object;
