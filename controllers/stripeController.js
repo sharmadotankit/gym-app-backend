@@ -6,12 +6,12 @@ const endpointSecret =process.env.WEBHOOK_SECRET;
 const handleSuccessPayment = async (req, res) => {
   try {
     const signature = req.headers["stripe-signature"];
-    const rawBody = req.body.toString('utf8');
-    console.log("rawBody ",rawBody)
+    // const rawBody = req.body.toString('utf8');
+    // console.log("rawBody ",rawBody)
     let event;
     try {
       event = stripe.webhooks.constructEvent(
-        rawBody,
+        req.body,
         signature,
         endpointSecret
       );

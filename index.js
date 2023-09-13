@@ -9,6 +9,7 @@ app.use(cors());
 app.use((req, res, next) => {
   if (req.originalUrl === "/stripe/handle-payment-success") {
     console.log('came here for app suer stripe')
+    // bodyParser.raw({ type: 'application/json' })
     next();
   } else {
     express.json()(req, res, next);
