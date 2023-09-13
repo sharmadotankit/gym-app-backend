@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const cors =require('cors');
 require("dotenv").config();
 const app = express();
-app.use(cors())
 
 const stripeRoute =  require('./routes/stripeRoute');
+
+app.use(cors());
 app.use('/stripe', stripeRoute);
 app.use(express.json());
 app.use(bodyParser.json())
