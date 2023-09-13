@@ -8,6 +8,7 @@ const stripeRoute = require("./routes/stripeRoute");
 
 app.use((req, res, next) => {
   if (req.originalUrl === "/stripe/handle-payment-success") {
+    console.log('came here for app suer stripe')
     next();
   } else {
     express.json()(req, res, next);
