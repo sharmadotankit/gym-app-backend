@@ -19,7 +19,10 @@ const handleSuccessPayment = async (req, res) => {
       return;
     }
 
-    console.log('event.data.object',event.data.object)
+    const session = event.data.object;
+    const userId = session.client_reference_id;
+    console.log('session',session)
+    console.log("userId",userId)
     switch (event.type) {
         case 'checkout.session.completed':
           const sessionData = event.data.object;
