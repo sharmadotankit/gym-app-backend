@@ -1,6 +1,5 @@
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 const UserModel = require("../Models/User");
-const StripeMetaDataModel = require('../Models/StripeMetaData');
 
 
 const createCheckoutSession = async (req, res) => {
@@ -43,18 +42,8 @@ const createCheckoutSession = async (req, res) => {
       line_items: paymentData,
       success_url: `${process.env.FRONTEND_URL}/payment-success/${userResponse._id}`,
       cancel_url: `${process.env.FRONTEND_URL}/payment-failed`,
-      client_reference_id:userResponse._id,
+      customer_email: userResponse.email, 
     });
-
-    let data ={
-      sessionId : session._id,
-      isDeleted:false,
-      userId:userResponse._id,
-    }
-
-    console.log(data)
-
-    // await StripeMetaDataModel.create(data);
 
     res.status(200).json({ status: true, url: session.url });
   } catch (err) {

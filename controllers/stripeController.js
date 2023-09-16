@@ -15,20 +15,17 @@ const handleSuccessPayment = async (req, res) => {
       );
     } catch (err) {
         console.log('err ror ',err)
-      res.status(400).send(`Webhook Error: ${err.message}`);
-      return;
+        res.status(400).send(`Webhook Error: ${err.message}`);
+        return;
     }
 
-    const session = event.data.object;
-    const userId = session.client_reference_id;
-    console.log('session',session)
-    console.log("userId",userId)
     switch (event.type) {
         case 'checkout.session.completed':
-          const sessionData = event.data.object;
-          const userId = sessionData.metadata.userId;
-          console.log(`User ID: ${userId}`);
-          await UserModel.findByIdAndUpdate(userId, { $set: { isPremium: true } });
+          const session = event.data.object;
+          const userEmail = session.customer_email;
+          console.log('session',session)
+          console.log(`userEmail: ${userEmail}`);
+          await UserModel.findOneAndUpdate({email:userEmail}, { $set: { isPremium: true } });
           break;
         default:
           console.log(`Unhandled event type ${event.type}`);
