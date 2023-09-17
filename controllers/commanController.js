@@ -145,8 +145,30 @@ const updateUserInformation = async(req,res)=>{
     }
  }
 
+
+ const connectToServer = async(req,res)=>{
+    try{
+         return res.status(200).json({
+             status:true,
+             message:"Connected To Server",
+             data:"Connected To Server",
+             error:null,
+         })
+    }
+    catch(err){
+     console.log("error",err)
+     return res.status(500).json({
+         status: false,
+         message: err.message,
+         error: err,
+         data:null,
+       });
+    }
+ }
+
 module.exports = {
     saveExerciseToProfile,
     updateUserInformation,
     fetchSavedExercise,
+    connectToServer,
 }

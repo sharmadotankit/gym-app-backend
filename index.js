@@ -19,6 +19,7 @@ app.use((req, res, next) => {
   }
 });
 
+
 app.use("/stripe", stripeRoute);
 
 const connectToMongo = require("./db");
