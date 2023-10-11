@@ -99,7 +99,7 @@ const login = async(req,res)=>{
             }
         }
 
-        jwtOptions = { expiresIn: '720h' }
+        let jwtOptions = { expiresIn: '720h' }
 
         let authToken = jwt.sign(data,JET,jwtOptions);
         let jwtUserResponse = await UserModel.findOneAndUpdate({_id:user._id},{token:authToken},{new:true});
